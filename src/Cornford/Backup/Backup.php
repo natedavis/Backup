@@ -38,11 +38,16 @@ class Backup extends BackupAbstract {
 
 		$result = $this->getBackupEngineInstance()->export($filepath);
 
-		if ($this->getCompress()) {
-			$filepath = $this->compressFile($filepath);
-		}
+		if ($result) {
+			if ($this->getCompress()) {
+				$filepath = $this->compressFile($filepath);
+			}
 
-		$this->setWorkingFilepath($filepath);
+			$this->setWorkingFilepath($filepath);
+		} else {
+			$this->removeFiles($filepath);
+			$this->setWorkingFilepath(null);
+		}
 
 		return $result;
 	}
@@ -68,6 +73,12 @@ class Backup extends BackupAbstract {
 
 		$this->setWorkingFilepath($filepath);
 
+		if ($this->getBackupFilesystemInstance()->checkFileEmpty($filepath)) {
+			$this->getBackupFilesystemInstance()->removeFile($filepath);
+
+			return false;
+		}
+
 		if ($this->isCompressed($filepath)) {
 			$filepath = $this->decompressFile($filepath);
 		}
@@ -89,6 +100,18 @@ class Backup extends BackupAbstract {
 	protected function isCompressed($filepath)
 	{
 		return pathinfo($filepath, PATHINFO_EXTENSION) === "gz";
+	}
+
+	/**
+	 * Remove files.
+	 *
+	 * @param string $filepath
+	 *
+	 * @return void
+	 */
+	protected function removeFiles($filepath)
+	{
+		$this->getBackupFilesystemInstance()->removeFile($filepath);
 	}
 
 	/**
@@ -200,7 +223,7 @@ class Backup extends BackupAbstract {
 				}
 			}
 		} catch (Exception $exception) {
-            		// Exception thrown continue and return empty result set
+			// Exception thrown continue and return empty result set
 		}
 
 		return $results;
