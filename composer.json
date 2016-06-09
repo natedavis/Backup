@@ -1,5 +1,5 @@
 {
-    "name": "natedavis/backup",
+    "name": "cornford/backup",
     "description": "An easy way backup and restore databases in Laravel.",
     "keywords": ["laravel", "database", "backup", "restore", "dump"],
     "license": "MIT",
@@ -23,6 +23,5 @@
         "psr-0": {
             "Cornford\\Backup": "src/"
         }
-    },
-    "minimum-stability": "stable"
+    }
 }
